@@ -6,10 +6,10 @@ Workspace: C:/Users/adrig/stocky/.superpowers/sdd/stocky-plan
 Repo: C:/Users/adrig/stocky
 
 ## Progress
-Tasks: 14 total — **Progress: 5/14 (36%)**
+Tasks: 14 total — **Progress: 7/14 (50%)**
 
-Last update: 2026-11-21 12:32
-Current: Task 6 — Product CRUD
+Last update: 2026-11-21 14:30
+Current: Task 8 — Stock Movements
 
 Commits:
 - be3062e (Task 1) — feat: initial project scaffolding (config + src)
@@ -17,6 +17,7 @@ Commits:
 - 1a07a82 (Task 3) — feat: authentication (login, register, forgot-password, reset-password, verify, AuthContext, middleware)
 - fc743d3 (Task 4) — feat: responsive layout (sidebar, topbar, mobile-nav, app-layout, theme-provider)
 - de4caed (Task 5) — feat: dashboard with KPIs, charts, recent movements, low stock alerts
+- 7819e35 (Task 6) — feat: Product CRUD (forms, list table, detail page, search/filter/pagination/delete)
 
 ## Task List
 - Task 1: DONE — commit be3062e
@@ -24,8 +25,8 @@ Commits:
 - Task 3: DONE — commit 1a07a82
 - Task 4: DONE — commit fc743d3
 - Task 5: DONE — commit de4caed
-- Task 6: pending — Product CRUD
-- Task 7: pending — Templates System
+- Task 6: DONE — commit 7819e35
+- Task 7: DONE — commit 2afcd05
 - Task 8: pending — Stock Movements
 - Task 9: pending — Low Stock Alerts
 - Task 10: pending — Search, Filters & Export
