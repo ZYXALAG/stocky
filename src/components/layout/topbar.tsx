@@ -12,6 +12,7 @@ import {
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeToggle } from './theme-toggle';
+import { AlertBadge } from '@/components/alerts/alert-badge';
 
 interface TopbarProps {
   onMenuClick: () => void;
@@ -57,14 +58,8 @@ export function Topbar({ onMenuClick }: TopbarProps) {
         </div>
       </div>
 
-      {/* Notifications */}
-      <button
-        className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-        aria-label="Notifications"
-      >
-        <Bell className="h-5 w-5" />
-        <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
-      </button>
+      {/* Notifications — AlertBadge */}
+      <AlertBadge />
 
       {/* Theme Toggle */}
       <ThemeToggle />

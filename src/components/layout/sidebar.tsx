@@ -14,8 +14,10 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { getAlertCount } from '@/lib/alerts';
+import { Badge } from '@/components/ui/badge';
 
 interface NavItem {
   label: string;
@@ -44,7 +46,16 @@ function isPathActive(pathname: string, href: string): boolean {
 export function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [alertCount, setAlertCount] = useState(0);
   const { profile, signOut } = useAuth();
+
+  useEffect(() => {
+    getAlertCount('').then(setAlertCount);
+    const interval = setInterval(() => {
+      getAlertCount('').then(setAlertCount);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const toggle = useCallback(() => setCollapsed((v) => !v), []);
 
@@ -76,6 +87,7 @@ export function Sidebar() {
           {navItems.map((item) => {
             const active = isPathActive(pathname, item.href);
             const Icon = item.icon;
+            const showAlertBadge = item.href === '/dashboard/alertes' && alertCount > 0;
             return (
               <li key={item.href}>
                 <Link
@@ -90,7 +102,14 @@ export function Sidebar() {
                   `}
                   title={collapsed ? item.label : undefined}
                 >
-                  <Icon className="h-5 w-5 flex-shrink-0" />
+                  <div className="relative flex items-center justify-center">
+                    <Icon className="h-5 w-5 flex-shrink-0" />
+                    {showAlertBadge && (
+                      <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                        {alertCount > 9 ? '9+' : alertCount}
+                      </span>
+                    )}
+                  </div>
                   {!collapsed && <span className="truncate">{item.label}</span>}
                 </Link>
               </li>

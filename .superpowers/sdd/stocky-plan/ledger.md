@@ -6,10 +6,10 @@ Workspace: C:/Users/adrig/stocky/.superpowers/sdd/stocky-plan
 Repo: C:/Users/adrig/stocky
 
 ## Progress
-Tasks: 14 total — **Progress: 7/14 (50%)**
+Tasks: 14 total — **Progress: 8/14 (57%)**
 
-Last update: 2026-11-21 14:30
-Current: Task 8 — Stock Movements
+Last update: 2026-11-21 15:05
+Current: Task 9 — Low Stock Alerts
 
 Commits:
 - be3062e (Task 1) — feat: initial project scaffolding (config + src)
@@ -27,7 +27,7 @@ Commits:
 - Task 5: DONE — commit de4caed
 - Task 6: DONE — commit 7819e35
 - Task 7: DONE — commit 2afcd05
-- Task 8: pending — Stock Movements
+- Task 8: DONE — commit 13730fa
 - Task 9: pending — Low Stock Alerts
 - Task 10: pending — Search, Filters & Export
 - Task 11: pending — QR Code / Barcode Scanner
