@@ -6,19 +6,20 @@ Workspace: C:/Users/adrig/stocky/.superpowers/sdd/stocky-plan
 Repo: C:/Users/adrig/stocky
 
 ## Progress
-Tasks: 14 total — **Progress: 2/14 (14%)**
+Tasks: 14 total — **Progress: 3/14 (21%)**
 
-Last update: 2026-11-21 00:04
-Current: Task 3 — Authentication
+Last update: 2026-11-21 00:48
+Current: Task 4 — Layout & Navigation
 
 Commits:
 - be3062e (Task 1) — feat: initial project scaffolding (config + src)
 - 6e2ee9d (Task 2) — feat: Supabase schema, migrations, seed data, client modules
+- d4f2a1c (Task 3) — feat: authentication (login, register, forgot-password, reset-password, verify, AuthContext, middleware protection)
 
 ## Task List
 - Task 1: DONE — commit be3062e
 - Task 2: DONE — commit 6e2ee9d
-- Task 3: pending — Authentication
+- Task 3: DONE — commit d4f2a1c
 - Task 4: pending — Layout & Navigation
 - Task 5: pending — Dashboard
 - Task 6: pending — Product CRUD
