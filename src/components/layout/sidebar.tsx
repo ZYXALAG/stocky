@@ -28,7 +28,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Produits', href: '/dashboard/produits', icon: Package },
-  { label: 'Catégories', href: '/dashboard/categorie', icon: Tag },
+  { label: 'Catégories', href: '/dashboard/categories', icon: Tag },
   { label: 'Fournisseurs', href: '/dashboard/fournisseurs', icon: Users },
   { label: 'Mouvements', href: '/dashboard/mouvements', icon: ArrowRightLeft },
   { label: 'Alertes', href: '/dashboard/alertes', icon: Bell },
