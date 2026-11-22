@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Plus, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Product } from '@/types/product';
 import { ProductForm } from '@/components/products/product-form';
 import { ProductList } from '@/components/products/product-list';
 import { ProductDetail } from '@/components/products/product-detail';
+import { SearchBar } from '@/components/search/search-bar';
+import { useKeyboardShortcuts } from '@/lib/hooks/use-keyboard-shortcuts';
 import { createClient } from '@/lib/supabase/client';
 
 type View = 'list' | 'detail';
@@ -18,6 +20,14 @@ export default function ProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [categories, setCategories] = useState<Map<string, string>>(new Map());
   const [suppliers, setSuppliers] = useState<Map<string, string>>(new Map());
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Keyboard shortcuts: Ctrl+K to focus search
+  useKeyboardShortcuts({
+    onSearchFocus: () => {
+      searchInputRef.current?.focus();
+    },
+  });
 
   const fetchOptions = useCallback(async () => {
     const supabase = createClient();
@@ -81,6 +91,15 @@ export default function ProductsPage() {
           <Plus className="mr-2 h-4 w-4" />
           Nouveau produit
         </Button>
+      </div>
+
+      {/* Search Bar */}
+      <div ref={searchInputRef}>
+        <SearchBar
+          entity="products"
+          fields={['name', 'description', 'id']}
+          placeholder="Rechercher un produit (Ctrl+K)..."
+        />
       </div>
 
       {view === 'list' && (

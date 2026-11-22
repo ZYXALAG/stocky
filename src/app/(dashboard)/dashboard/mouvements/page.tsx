@@ -1,19 +1,30 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Plus, ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Product } from '@/types/product';
 import {
   StockMovement,
   MovementType,
+  formatMovementType,
 } from '@/types/stock-movement';
 import { MovementList } from '@/components/movements/movement-list';
 import { MovementDetail } from '@/components/movements/movement-detail';
 import { MovementForm } from '@/components/movements/movement-form';
+import { SearchBar } from '@/components/search/search-bar';
+import { useKeyboardShortcuts } from '@/lib/hooks/use-keyboard-shortcuts';
 import { createClient } from '@/lib/supabase/client';
 
 type View = 'list' | 'detail';
+
+const movementTypeLabels: Record<MovementType, string> = {
+  in: 'Entrée',
+  out: 'Sortie',
+  adjustment: 'Ajustement',
+  transfer: 'Transfert',
+};
 
 export default function MovementsPage() {
   const [view, setView] = useState<View>('list');
@@ -23,6 +34,15 @@ export default function MovementsPage() {
   const [editingMovement, setEditingMovement] = useState<StockMovement | null>(null);
   const [productsMap, setProductsMap] = useState<Map<string, Product>>(new Map());
   const [products, setProducts] = useState<Product[]>([]);
+  const [typeFilter, setTypeFilter] = useState<MovementType | 'all'>('all');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Keyboard shortcuts: Ctrl+K to focus search
+  useKeyboardShortcuts({
+    onSearchFocus: () => {
+      searchInputRef.current?.focus();
+    },
+  });
 
   const fetchProducts = useCallback(async () => {
     const supabase = createClient();
@@ -107,11 +127,42 @@ export default function MovementsPage() {
         </Button>
       </div>
 
+      {/* Search Bar */}
+      <div ref={searchInputRef}>
+        <SearchBar
+          entity="movements"
+          fields={['reference', 'notes', 'id']}
+          placeholder="Rechercher un mouvement (Ctrl+K)..."
+        />
+      </div>
+
+      {/* Movement type filter chips */}
+      <div className="flex flex-wrap gap-2">
+        <Badge
+          variant={typeFilter === 'all' ? 'default' : 'outline'}
+          className="cursor-pointer px-3 py-1 text-sm"
+          onClick={() => setTypeFilter('all')}
+        >
+          Tous
+        </Badge>
+        {Object.entries(movementTypeLabels).map(([key, label]) => (
+          <Badge
+            key={key}
+            variant={typeFilter === key ? 'default' : 'outline'}
+            className="cursor-pointer px-3 py-1 text-sm"
+            onClick={() => setTypeFilter(key as MovementType)}
+          >
+            {label}
+          </Badge>
+        ))}
+      </div>
+
       {/* View */}
       {view === 'list' && (
         <MovementList
           onEdit={handleEdit}
           onView={handleViewDetail}
+          typeFilter={typeFilter}
         />
       )}
 

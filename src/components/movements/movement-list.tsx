@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Search, ChevronLeft, ChevronRight, Filter, Trash2 } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Search, ChevronLeft, ChevronRight, Filter, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,15 +38,17 @@ import {
   getMovementColor,
 } from '@/types/stock-movement';
 import { toast } from '@/hooks/use-toast';
+import { ExportButton } from '@/components/export/export-button';
 
 const PAGE_SIZE = 15;
 
 interface MovementListProps {
   onEdit: (movement: StockMovement) => void;
   onView: (movement: StockMovement) => void;
+  typeFilter?: MovementType | 'all';
 }
 
-export function MovementList({ onEdit, onView }: MovementListProps) {
+export function MovementList({ onEdit, onView, typeFilter: typeFilterProp }: MovementListProps) {
   const [movements, setMovements] = useState<StockMovement[]>([]);
   const [products, setProducts] = useState<Map<string, string>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -59,6 +61,34 @@ export function MovementList({ onEdit, onView }: MovementListProps) {
   const [total, setTotal] = useState(0);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  // Export data for ExportButton
+  const exportData = useMemo(() => {
+    const typeLabel = (t: MovementType) =>
+      t === 'in' ? 'Entrée' : t === 'out' ? 'Sortie' : t === 'adjustment' ? 'Ajustement' : 'Transfert';
+    return movements.map((m) => ({
+      'ID': m.id,
+      'Type': typeLabel(m.movement_type),
+      'Quantité': m.quantity,
+      'Produit': products.get(m.product_id || '') || '—',
+      'Lieu départ': m.location_from || '—',
+      'Lieu arrivée': m.location_to || '—',
+      'Référence': m.reference || '—',
+      'Notes': m.notes || '',
+      'Date': formatDate(m.created_at),
+    }));
+  }, [movements, products]);
+
+  // Effective type filter: prop takes precedence over internal state
+  const effectiveTypeFilter = typeFilterProp ?? typeFilter;
+
+  // Sync internal state when page provides a filter
+  useEffect(() => {
+    if (typeFilterProp !== undefined) {
+      setTypeFilter(typeFilterProp);
+    }
+  }, [typeFilterProp]);
 
   const fetchMovements = useCallback(async () => {
     setLoading(true);
@@ -74,8 +104,8 @@ export function MovementList({ onEdit, onView }: MovementListProps) {
         .order('created_at', { ascending: false })
         .range(start, end);
 
-      if (typeFilter !== 'all') {
-        query = query.eq('movement_type', typeFilter);
+      if (effectiveTypeFilter !== 'all') {
+        query = query.eq('movement_type', effectiveTypeFilter);
       }
       if (productFilter !== 'all') {
         query = query.eq('product_id', productFilter);
@@ -101,7 +131,7 @@ export function MovementList({ onEdit, onView }: MovementListProps) {
     } finally {
       setLoading(false);
     }
-  }, [typeFilter, productFilter, dateFrom, dateTo, search, page]);
+  }, [effectiveTypeFilter, productFilter, dateFrom, dateTo, search, page]);
 
   const fetchProducts = useCallback(async () => {
     const supabase = createClient();
@@ -135,8 +165,23 @@ export function MovementList({ onEdit, onView }: MovementListProps) {
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
+  const activeFilterCount = [
+    effectiveTypeFilter !== 'all',
+    productFilter !== 'all',
+    dateFrom,
+    dateTo,
+  ].filter(Boolean).length;
+
+  // Movement type options
+  const movementTypeOptions: { value: MovementType | 'all'; label: string }[] = [
+    { value: 'all', label: 'Tous' },
+    { value: 'in', label: 'Entrée' },
+    { value: 'out', label: 'Sortie' },
+    { value: 'adjustment', label: 'Ajustement' },
+    { value: 'transfer', label: 'Transfert' },
+  ];
+
   // Count product names matching search
-  const productNames = Array.from(products.values());
   const searchProductMatch = (name: string) => {
     if (!search) return true;
     return name.toLowerCase().includes(search.toLowerCase());
@@ -144,9 +189,10 @@ export function MovementList({ onEdit, onView }: MovementListProps) {
 
   return (
     <div>
-      {/* Search + Filters */}
+      {/* Filter bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 flex-wrap items-center gap-3">
+          {/* Search */}
           <div className="relative flex-1 min-w-[200px] max-w-md">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -160,74 +206,107 @@ export function MovementList({ onEdit, onView }: MovementListProps) {
             />
           </div>
 
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <Select
-              value={typeFilter}
-              onValueChange={(v) => {
-                setTypeFilter(v as MovementType | 'all');
-                setPage(1);
-              }}
-            >
-              <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Tous types" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tous types</SelectItem>
-                <SelectItem value="in">Entrée</SelectItem>
-                <SelectItem value="out">Sortie</SelectItem>
-                <SelectItem value="adjustment">Ajustement</SelectItem>
-                <SelectItem value="transfer">Transfert</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Movement type chips */}
+          <div className="flex gap-1.5">
+            {movementTypeOptions.map((opt) => (
+              <Badge
+                key={opt.value}
+                variant={typeFilter === opt.value ? 'default' : 'outline'}
+                className="cursor-pointer px-2.5 py-0.5 text-xs hover:bg-accent"
+                onClick={() => { setTypeFilter(opt.value as MovementType | 'all'); setPage(1); }}
+              >
+                {opt.label}
+              </Badge>
+            ))}
           </div>
 
-          <Select
-            value={productFilter}
-            onValueChange={(v) => {
-              setProductFilter(v);
-              setPage(1);
-            }}
+          {/* Advanced filter toggle */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => setFiltersOpen(!filtersOpen)}
           >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Tous produits" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tous produits</SelectItem>
-              {Array.from(products.entries())
-                .filter(([id]) => searchProductMatch(products.get(id) || ''))
-                .map(([id, name]) => (
-                  <SelectItem key={id} value={id}>{name}</SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
+            <Filter className="h-4 w-4" />
+            Filtres
+            {activeFilterCount > 0 && (
+              <Badge variant="secondary" className="h-5 w-5 p-0 text-[10px]">
+                {activeFilterCount}
+              </Badge>
+            )}
+          </Button>
 
-          <Input
-            type="date"
-            value={dateFrom}
-            onChange={(e) => {
-              setDateFrom(e.target.value);
-              setPage(1);
-            }}
-            placeholder="Date début"
-            className="w-[150px]"
-          />
-          <Input
-            type="date"
-            value={dateTo}
-            onChange={(e) => {
-              setDateTo(e.target.value);
-              setPage(1);
-            }}
-            placeholder="Date fin"
-            className="w-[150px]"
-          />
+          {/* Export button */}
+          <ExportButton data={exportData} filename="mouvements" />
         </div>
 
         <Badge variant="secondary" className="self-start">
           {total} mouvement{total !== 1 ? 's' : ''}
         </Badge>
       </div>
+
+      {/* Advanced Filters Panel */}
+      {filtersOpen && (
+        <div className="mt-4 grid grid-cols-1 gap-4 rounded-lg border border-border bg-card p-4 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Product filter */}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">Produit</label>
+            <Select
+              value={productFilter}
+              onValueChange={(v) => { setProductFilter(v); setPage(1); }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Tous produits" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous produits</SelectItem>
+                {Array.from(products.entries())
+                  .filter(([id, name]) => searchProductMatch(name))
+                  .map(([id, name]) => (
+                    <SelectItem key={id} value={id}>{name}</SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Date range */}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">Date début</label>
+            <Input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => { setDateFrom(e.target.value); setPage(1); }}
+              className="h-9"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-muted-foreground">Date fin</label>
+            <Input
+              type="date"
+              value={dateTo}
+              onChange={(e) => { setDateTo(e.target.value); setPage(1); }}
+              className="h-9"
+            />
+          </div>
+
+          {/* Reset button */}
+          <div className="flex items-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setProductFilter('all');
+                setDateFrom('');
+                setDateTo('');
+                setPage(1);
+              }}
+            >
+              Réinitialiser
+            </Button>
+          </div>
+        </div>
+      )}
 
       <Separator className="my-4" />
 
@@ -404,21 +483,5 @@ export function MovementList({ onEdit, onView }: MovementListProps) {
         </DialogContent>
       </Dialog>
     </div>
-  );
-}
-
-function ArrowUp({ className }: { className?: string }) {
-  return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 19V5M5 12l7-7 7 7" />
-    </svg>
-  );
-}
-
-function ArrowDown({ className }: { className?: string }) {
-  return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 5v14M5 12l7 7 7-7" />
-    </svg>
   );
 }
