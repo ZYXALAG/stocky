@@ -6,10 +6,10 @@ Workspace: C:/Users/adrig/stocky/.superpowers/sdd/stocky-plan
 Repo: C:/Users/adrig/stocky
 
 ## Progress
-Tasks: 14 total — **Progress: 10/14 (71%)**
+Tasks: 14 total — **Progress: 12/14 (86%)**
 
-Last update: 2026-11-22 22:45
-Current: Task 11 — QR Code / Barcode Scanner
+Last update: 2026-11-22 23:45
+Current: Task 13 — PWA & Capacitor
 
 Commits:
 - be3062e (Task 1) — feat: initial project scaffolding (config + src)
@@ -30,7 +30,7 @@ Commits:
 - Task 8: DONE — commit 13730fa
 - Task 9: DONE — commit e7dd85a
 - Task 10: DONE — commit 3c5273b
-- Task 11: pending — QR Code / Barcode Scanner
-- Task 12: pending — Suppliers & Categories
+- Task 11: DONE — commit 716af1c
+- Task 12: DONE — commit 5e39bc6
 - Task 13: pending — PWA & Capacitor
 - Task 14: pending — Documentation & Deployment

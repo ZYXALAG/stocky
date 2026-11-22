@@ -1,6 +1,14 @@
 'use client';
 
-import { LayoutDashboard, Package, ArrowRightLeft, Bell, Menu } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Package,
+  ArrowRightLeft,
+  Bell,
+  Menu,
+  Settings,
+  Smartphone,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -15,7 +23,7 @@ const mobileNavItems: MobileNavItem[] = [
   { label: 'Produits', href: '/dashboard/produits', icon: Package },
   { label: 'Mouvements', href: '/dashboard/mouvements', icon: ArrowRightLeft },
   { label: 'Alertes', href: '/dashboard/alertes', icon: Bell },
-  { label: 'Menu', href: '/dashboard', icon: Menu },
+  { label: 'Paramètres', href: '/dashboard/parametres', icon: Settings },
 ];
 
 function isPathActive(pathname: string, href: string): boolean {
@@ -40,9 +48,11 @@ export function MobileNav() {
             className={`
               flex flex-1 flex-col items-center justify-center gap-1 py-2 text-xs font-medium
               transition-colors duration-150
-              ${active
-                ? 'text-primary'
-                : 'text-muted-foreground hover:text-foreground'}
+              ${
+                active
+                  ? 'text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }
             `}
           >
             <Icon className={`h-5 w-5 ${active ? 'stroke-[2.5px]' : ''}`} />
