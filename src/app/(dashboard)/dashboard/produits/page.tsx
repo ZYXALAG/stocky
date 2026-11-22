@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import { Plus, Package } from 'lucide-react';
+import { Plus, Package, QrCode, Barcode, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Product } from '@/types/product';
 import { ProductForm } from '@/components/products/product-form';
@@ -10,6 +10,9 @@ import { ProductDetail } from '@/components/products/product-detail';
 import { SearchBar } from '@/components/search/search-bar';
 import { useKeyboardShortcuts } from '@/lib/hooks/use-keyboard-shortcuts';
 import { createClient } from '@/lib/supabase/client';
+import { QRCodeModal } from '@/components/qr/qr-code-modal';
+import { BarcodeScanner } from '@/components/barcode/barcode-scanner';
+import { PrintLabels } from '@/components/qr/print-labels';
 
 type View = 'list' | 'detail';
 
@@ -21,6 +24,13 @@ export default function ProductsPage() {
   const [categories, setCategories] = useState<Map<string, string>>(new Map());
   const [suppliers, setSuppliers] = useState<Map<string, string>>(new Map());
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // QR code modal for selected product
+  const [qrOpen, setQROpen] = useState(false);
+  // Barcode scanner
+  const [scannerOpen, setScannerOpen] = useState(false);
+  // Print labels
+  const [printLabelsOpen, setPrintLabelsOpen] = useState(false);
 
   // Keyboard shortcuts: Ctrl+K to focus search
   useKeyboardShortcuts({
@@ -72,6 +82,12 @@ export default function ProductsPage() {
     setSelectedProduct(null);
   };
 
+  const handleScanResult = useCallback((result: string) => {
+    // Try to find a product by QR data or scan result
+    console.log('Barcode scanned:', result);
+    // Could add logic here to find matching product by SKU
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -87,10 +103,20 @@ export default function ProductsPage() {
             </p>
           </div>
         </div>
-        <Button onClick={handleNew}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nouveau produit
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setPrintLabelsOpen(true)}>
+            <Printer className="mr-2 h-4 w-4" />
+            Étiquettes
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setScannerOpen(true)}>
+            <Barcode className="mr-2 h-4 w-4" />
+            Scanner
+          </Button>
+          <Button onClick={handleNew}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nouveau produit
+          </Button>
+        </div>
       </div>
 
       {/* Search Bar */}
@@ -125,6 +151,28 @@ export default function ProductsPage() {
         open={formOpen}
         onOpenChange={setFormOpen}
         onSave={handleSave}
+      />
+
+      {/* QR Code Modal */}
+      <QRCodeModal
+        product={selectedProduct || editingProduct || { id: '', name: '', description: '', base_quantity: 0, alert_threshold: 5 } as Product}
+        open={qrOpen}
+        onOpenChange={setQROpen}
+      />
+
+      {/* Barcode Scanner */}
+      <BarcodeScanner
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        onScan={handleScanResult}
+        facingMode="environment"
+      />
+
+      {/* Print Labels */}
+      <PrintLabels
+        products={[]}
+        open={printLabelsOpen}
+        onOpenChange={setPrintLabelsOpen}
       />
     </div>
   );

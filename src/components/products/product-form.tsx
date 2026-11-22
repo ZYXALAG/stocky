@@ -29,6 +29,7 @@ import {
   type Category,
   type Supplier,
 } from '@/types/product';
+import { generateSKU } from '@/lib/products';
 
 const productSchema = z.object({
   name: z.string().min(1, 'Le nom est requis'),
@@ -39,7 +40,7 @@ const productSchema = z.object({
   base_quantity: z.coerce.number().min(0, 'La quantité doit être ≥ 0'),
   base_cost_price: z.coerce.number().min(0, 'Le coût doit être ≥ 0').nullable().optional(),
   base_selling_price: z.coerce.number().min(0, 'Le prix de vente doit être ≥ 0').nullable().optional(),
-  alert_threshold: z.coerce.number().min(0, 'Le seuil d\'alerte doit être ≥ 0'),
+  alert_threshold: z.coerce.number().min(0, 'Le seuil d&apos;alerte doit être ≥ 0'),
 });
 
 export type ProductFormData = z.infer<typeof productSchema>;
@@ -175,6 +176,12 @@ export function ProductForm({ product, open, onOpenChange, onSave }: ProductForm
     }
   };
 
+  const handleGenerateSKU = useCallback(() => {
+    const sku = generateSKU(product?.template_id || undefined);
+    // Could store in custom_fields or a separate SKU field
+    toast({ title: 'SKU généré', description: `${sku} — ajoutez-le aux champs personnalisés.` });
+  }, [product]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -304,6 +311,16 @@ export function ProductForm({ product, open, onOpenChange, onSave }: ProductForm
               />
             </div>
           </div>
+
+          {/* SKU generation helper */}
+          {product && (
+            <div className="rounded-lg border border-dashed p-3 flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">SKU / QR</span>
+              <Button variant="outline" size="sm" type="button" onClick={handleGenerateSKU}>
+                Générer SKU
+              </Button>
+            </div>
+          )}
 
           <DialogFooter className="sm:justify-between">
             <Button

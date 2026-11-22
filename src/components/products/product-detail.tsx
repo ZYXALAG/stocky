@@ -1,12 +1,17 @@
 'use client';
 
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, QrCode, Barcode, Printer } from 'lucide-react';
 import Link from 'next/link';
 import { Product } from '@/types/product';
 import { formatDate } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { QRCode } from '@/components/qr/qr-code';
+import { QRCodeModal } from '@/components/qr/qr-code-modal';
+import { BarcodeScanner } from '@/components/barcode/barcode-scanner';
+import { generateQRData } from '@/lib/products';
+import { useState, useCallback } from 'react';
 
 interface ProductDetailProps {
   product: Product;
@@ -20,6 +25,18 @@ export function ProductDetail({ product, categories, suppliers, onEdit, onBack }
   const lowStock = product.base_quantity <= product.alert_threshold;
   const stockValue = (product.base_quantity || 0) * (product.base_cost_price || 0);
 
+  // QR modal state
+  const [qrOpen, setQROpen] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
+
+  // Action buttons row for QR/scan
+  const handleScanResult = useCallback((result: string) => {
+    // Could navigate to the scanned product or record a movement
+    console.log('Scanned:', result);
+  }, []);
+
+  const qrData = generateQRData(product.id, product.template_id, product.name);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -29,14 +46,23 @@ export function ProductDetail({ product, categories, suppliers, onEdit, onBack }
           Retour
         </Button>
         <div className="flex-1" />
-        <Button onClick={() => onEdit(product)}>
-          Éditer le produit
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setScannerOpen(true)}>
+            <Barcode className="mr-2 h-4 w-4" />
+            Scanner
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setQROpen(true)}>
+            <QrCode className="mr-2 h-4 w-4" />
+            QR Code
+          </Button>
+          <Button onClick={() => onEdit(product)}>
+            Éditer le produit
+          </Button>
+        </div>
       </div>
 
       <Separator />
 
-      {/* Info Grid */}
       <div className="grid gap-6 md:grid-cols-3">
         {/* Main Info */}
         <div className="md:col-span-2 space-y-6">
@@ -122,6 +148,25 @@ export function ProductDetail({ product, categories, suppliers, onEdit, onBack }
 
         {/* Meta sidebar */}
         <div className="space-y-4">
+          {/* Mini QR code preview */}
+          <div className="rounded-lg border p-4 space-y-3">
+            <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
+              QR Code
+            </h3>
+            <div className="flex justify-center">
+              <QRCode data={qrData} size={150} includeLabel={true} label={product.name} />
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={() => setQROpen(true)}
+            >
+              <QrCode className="mr-2 h-4 w-4" />
+              Ouvrir le QR Code complet
+            </Button>
+          </div>
+
           <div className="rounded-lg border p-4 space-y-3">
             <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
               Informations
@@ -155,6 +200,21 @@ export function ProductDetail({ product, categories, suppliers, onEdit, onBack }
           )}
         </div>
       </div>
+
+      {/* QR Code Modal */}
+      <QRCodeModal
+        product={product}
+        open={qrOpen}
+        onOpenChange={setQROpen}
+      />
+
+      {/* Barcode Scanner */}
+      <BarcodeScanner
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        onScan={handleScanResult}
+        facingMode="environment"
+      />
     </div>
   );
 }

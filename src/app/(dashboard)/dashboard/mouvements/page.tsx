@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import { Plus, ArrowUpRight } from 'lucide-react';
+import { Plus, ArrowUpRight, Barcode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Product } from '@/types/product';
@@ -16,6 +16,9 @@ import { MovementForm } from '@/components/movements/movement-form';
 import { SearchBar } from '@/components/search/search-bar';
 import { useKeyboardShortcuts } from '@/lib/hooks/use-keyboard-shortcuts';
 import { createClient } from '@/lib/supabase/client';
+import { toast } from '@/hooks/use-toast';
+import { BarcodeScanner } from '@/components/barcode/barcode-scanner';
+import { parseQRData } from '@/lib/products';
 
 type View = 'list' | 'detail';
 
@@ -36,6 +39,9 @@ export default function MovementsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [typeFilter, setTypeFilter] = useState<MovementType | 'all'>('all');
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Barcode scanner
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   // Keyboard shortcuts: Ctrl+K to focus search
   useKeyboardShortcuts({
@@ -106,6 +112,50 @@ export default function MovementsPage() {
     setSelectedProduct(null);
   };
 
+  const handleScanResult = useCallback((result: string) => {
+    // Parse QR data to find product
+    const qrData = parseQRData(result);
+    if (qrData && qrData.productId) {
+      // Check if product is in map
+      let product = productsMap.get(qrData.productId);
+      if (!product) {
+        // Fetch from Supabase
+        (async () => {
+          const supabase = createClient();
+          const { data: prodData } = await supabase
+            .from('products')
+            .select('*')
+            .eq('id', qrData.productId)
+            .single();
+          if (prodData) {
+            const prod = prodData as Product;
+            const newMap = new Map(productsMap);
+            newMap.set(prod.id, prod);
+            setProductsMap(newMap);
+            setProducts((prev) => [...prev, prod]);
+            // Navigate to product detail / create movement
+            setSelectedProduct(prod);
+            toast({
+              title: 'Produit trouvé',
+              description: `${prod.name} (Qté: ${prod.base_quantity})`,
+            });
+          }
+        })();
+      } else {
+        setSelectedProduct(product);
+        toast({
+          title: 'Produit trouvé',
+          description: `${product.name} (Qté: ${product.base_quantity})`,
+        });
+      }
+    } else {
+      toast({
+        title: 'Code détecté',
+        description: `Résultat: ${result.slice(0, 50)}`,
+      });
+    }
+  }, [productsMap]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -121,10 +171,16 @@ export default function MovementsPage() {
             </p>
           </div>
         </div>
-        <Button onClick={handleNew}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nouveau mouvement
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setScannerOpen(true)}>
+            <Barcode className="mr-2 h-4 w-4" />
+            Scanner
+          </Button>
+          <Button onClick={handleNew}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nouveau mouvement
+          </Button>
+        </div>
       </div>
 
       {/* Search Bar */}
@@ -185,6 +241,14 @@ export default function MovementsPage() {
           setFormOpen(open);
         }}
         onSave={handleSave}
+      />
+
+      {/* Barcode Scanner */}
+      <BarcodeScanner
+        open={scannerOpen}
+        onOpenChange={setScannerOpen}
+        onScan={handleScanResult}
+        facingMode="environment"
       />
     </div>
   );

@@ -35,3 +35,48 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ─── Print styles ─── */
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  /* Hide non-printable UI elements */
+  nav,
+  .no-print,
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  /* Ensure backgrounds render */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* QR codes should be crisp in print */
+  canvas,
+  img.qr-code {
+    page-break-inside: avoid;
+  }
+
+  /* Labels on A4 sheets */
+  .print-labels-container {
+    width: 180mm;
+    margin: 0 auto;
+  }
+
+  .print-labels-grid {
+    display: grid;
+    gap: 2mm;
+  }
+
+  .print-label {
+    page-break-inside: avoid;
+    border: 0.5px solid #ccc;
+    border-radius: 2mm;
+    padding: 2mm;
+  }
+}
