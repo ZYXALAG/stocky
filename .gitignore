@@ -35,12 +35,23 @@ $PYTHONDONTWRITEBYTECODE
 next-env.d.ts
 
 # native/Capacitor
-native/
+android/
+ios/
 capacitor.config.local.ts
 
 # IDE
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # OS
 Thumbs.db
+.DS_Store
+._*
+
+# Vercel
+.vercel
+
+# Capacitor
+.native/

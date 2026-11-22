@@ -6,10 +6,10 @@ Workspace: C:/Users/adrig/stocky/.superpowers/sdd/stocky-plan
 Repo: C:/Users/adrig/stocky
 
 ## Progress
-Tasks: 14 total — **Progress: 12/14 (86%)**
+Tasks: 14 total — **Progress: 13/14 (93%)**
 
-Last update: 2026-11-22 23:45
-Current: Task 13 — PWA & Capacitor
+Last update: 2026-11-23 00:30
+Current: Task 14 — Documentation & Deployment
 
 Commits:
 - be3062e (Task 1) — feat: initial project scaffolding (config + src)
@@ -32,5 +32,5 @@ Commits:
 - Task 10: DONE — commit 3c5273b
 - Task 11: DONE — commit 716af1c
 - Task 12: DONE — commit 5e39bc6
-- Task 13: pending — PWA & Capacitor
+- Task 13: DONE — commit e833ab7
 - Task 14: pending — Documentation & Deployment
