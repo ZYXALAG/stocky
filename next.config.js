@@ -1,29 +1,12 @@
-const withPWA = require('next-pwa')({
-  dest: 'public',
-  register: true,
-  skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development',
-  exclude: [
-    /\/_next\/.+/,
-    /\/api\/.+/,
-    /.*\.(svg|ico|png|jpg|jpeg|gif|webp)$/,
-    /\/api\/(auth|supabase)/,
-  ],
-  include: [
-    /\/dashboard/,
-    /\/produits/,
-    /\/mouvements/,
-    /\/categories/,
-    /\/fournisseurs/,
-    /\/alertes/,
-  ],
-});
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     remotePatterns: [],
   },
+  webpack: (config) => {
+    // PWA will be handled by a manual service worker setup
+    return config;
+  },
 };
 
-module.exports = withPWA(nextConfig);
+module.exports = nextConfig;

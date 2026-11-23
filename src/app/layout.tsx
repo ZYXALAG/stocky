@@ -11,6 +11,7 @@ import { InstallPrompt } from '@/components/pwa/install-prompt';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://stocky.vercel.app'),
   title: {
     default: 'Stocky — Universal Inventory Management',
     template: '%s | Stocky',

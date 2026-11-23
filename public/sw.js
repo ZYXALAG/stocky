@@ -1,1 +1,62 @@
-if(!self.define){let e,s={};const a=(a,n)=>(a=new URL(a+".js",n).href,s[a]||new Promise(s=>{if("document"in self){const e=document.createElement("script");e.src=a,e.onload=s,document.head.appendChild(e)}else e=a,importScripts(a),s()}).then(()=>{let e=s[a];if(!e)throw new Error(`Module ${a} didn’t register its module`);return e}));self.define=(n,t)=>{const i=e||("document"in self?document.currentScript.src:"")||location.href;if(s[i])return;let r={};const c=e=>a(e,i),o={module:{uri:i},exports:r,require:c};s[i]=Promise.all(n.map(e=>o[e]||c(e))).then(e=>(t(...e),r))}}define(["./workbox-f63dece8"],function(e){"use strict";importScripts(),self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"/_next/server/app/(dashboard)/alertes/page_client-reference-manifest.js",revision:"7f4f623b63656806acff1589d6eb8332"},{url:"/_next/server/app/(dashboard)/categories/page_client-reference-manifest.js",revision:"53e49d1f5a5fe54b8b74ddf2fd2aca5e"},{url:"/_next/server/app/(dashboard)/fournisseurs/page_client-reference-manifest.js",revision:"19b4a2f69351fe5760d8925d34c6ed51"},{url:"/_next/server/app/(dashboard)/mouvements/page_client-reference-manifest.js",revision:"16d748d9dd8abe590ffd2b654fd01492"},{url:"/_next/server/app/(dashboard)/produits/page_client-reference-manifest.js",revision:"e9d283e06a2ee4ff2c53b148fd9daadb"},{url:"/_next/static/chunks/app/(dashboard)/alertes/page-d444af965eb74590.js",revision:"N40-qi_S0ay4SwCUbbeRz"},{url:"/_next/static/chunks/app/(dashboard)/categories/page-4867fff761a9c8f6.js",revision:"N40-qi_S0ay4SwCUbbeRz"},{url:"/_next/static/chunks/app/(dashboard)/fournisseurs/page-b4158f39695febdb.js",revision:"N40-qi_S0ay4SwCUbbeRz"},{url:"/_next/static/chunks/app/(dashboard)/mouvements/page-fff49d9e28d15bb4.js",revision:"N40-qi_S0ay4SwCUbbeRz"},{url:"/_next/static/chunks/app/(dashboard)/produits/page-bda0b28029bd41cc.js",revision:"N40-qi_S0ay4SwCUbbeRz"},{url:"/icon-192.png",revision:"1a3c9824be03e61de31a6f6b1fa18868"},{url:"/icon-512.png",revision:"781cb7e076df96cf6517943ad34f15b7"},{url:"/manifest.json",revision:"d4d0c005581eb69abd11ed3456f40a50"},{url:"/splash-1024.png",revision:"05d95a7f8df0055c0584507aa2fda900"},{url:"/splash-320.png",revision:"1a83d3df8631db460b931d5f1690d09e"},{url:"/splash-640.png",revision:"731fac04c9cb3421578ac0e434a62722"},{url:"/splash-768.png",revision:"8c57650609d8c0fa8ab2d5916ba2a5c8"}],{ignoreURLParametersMatching:[]}),e.cleanupOutdatedCaches(),e.registerRoute("/",new e.NetworkFirst({cacheName:"start-url",plugins:[{cacheWillUpdate:async({request:e,response:s,event:a,state:n})=>s&&"opaqueredirect"===s.type?new Response(s.body,{status:200,statusText:"OK",headers:s.headers}):s}]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:gstatic)\.com\/.*/i,new e.CacheFirst({cacheName:"google-fonts-webfonts",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:31536e3})]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:googleapis)\.com\/.*/i,new e.StaleWhileRevalidate({cacheName:"google-fonts-stylesheets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800})]}),"GET"),e.registerRoute(/\.(?:eot|otf|ttc|ttf|woff|woff2|font.css)$/i,new e.StaleWhileRevalidate({cacheName:"static-font-assets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800})]}),"GET"),e.registerRoute(/\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,new e.StaleWhileRevalidate({cacheName:"static-image-assets",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/_next\/image\?url=.+$/i,new e.StaleWhileRevalidate({cacheName:"next-image",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:mp3|wav|ogg)$/i,new e.CacheFirst({cacheName:"static-audio-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:mp4)$/i,new e.CacheFirst({cacheName:"static-video-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:js)$/i,new e.StaleWhileRevalidate({cacheName:"static-js-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:css|less)$/i,new e.StaleWhileRevalidate({cacheName:"static-style-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/_next\/data\/.+\/.+\.json$/i,new e.StaleWhileRevalidate({cacheName:"next-data",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:json|xml|csv)$/i,new e.NetworkFirst({cacheName:"static-data-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(({url:e})=>{if(!(self.origin===e.origin))return!1;const s=e.pathname;return!s.startsWith("/api/auth/")&&!!s.startsWith("/api/")},new e.NetworkFirst({cacheName:"apis",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:16,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(({url:e})=>{if(!(self.origin===e.origin))return!1;return!e.pathname.startsWith("/api/")},new e.NetworkFirst({cacheName:"others",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(({url:e})=>!(self.origin===e.origin),new e.NetworkFirst({cacheName:"cross-origin",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:3600})]}),"GET")});
+/// <reference lib="webworker" />
+
+/* eslint-disable no-var */
+var self: ServiceWorkerGlobalScope = self as any;
+
+const CACHE_NAME = 'stocky-v1';
+const STATIC_ASSETS = [
+  '/',
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/verify',
+];
+
+// Install event - cache static assets
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(STATIC_ASSETS);
+    })
+  );
+  self.skipWaiting();
+});
+
+// Activate event - clean old caches
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames
+          .filter((name) => name !== CACHE_NAME)
+          .map((name) => caches.delete(name))
+      );
+    })
+  );
+  self.clients.claim();
+});
+
+// Fetch event - serve from cache, fallback to network
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached;
+      return fetch(event.request).then((response) => {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response;
+        }
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseToCache);
+        });
+        return response;
+      }).catch(() => {
+        // Offline fallback for navigation requests
+        if (event.request.mode === 'navigate') {
+          return caches.match('/');
+        }
+      });
+    })
+  );
+});
