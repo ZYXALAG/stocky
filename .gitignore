@@ -57,3 +57,8 @@ Thumbs.db
 .native/
 
 .vercel
+
+# debug scratch
+.apply_sql.py
+.check_table.js
+.check_table.mjs
