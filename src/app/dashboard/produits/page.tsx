@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Plus, Package, QrCode, Barcode, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Product } from '@/types/product';
@@ -54,7 +54,7 @@ export default function ProductsPage() {
   }, []);
 
   // Initial load
-  useState(() => { fetchOptions(); });
+  useEffect(() => { fetchOptions(); }, [fetchOptions]);
 
   const handleNew = () => {
     setEditingProduct(null);

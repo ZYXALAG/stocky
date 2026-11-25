@@ -1,55 +1,128 @@
-import { Metadata } from 'next';
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Mail, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
-import { ArrowLeft, Mail, CheckCircle } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: 'Vérifier votre email — Stocky',
-  description: 'Vérifiez votre adresse email pour activer votre compte.',
-};
+function VerifyContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+  const [message, setMessage] = useState('Vérification en cours...');
 
-export default function VerifyPage() {
+  useEffect(() => {
+    const verify = async () => {
+      const supabase = createClient();
+      const code = searchParams.get('code');
+      const error = searchParams.get('error');
+      const errorDescription = searchParams.get('error_description');
+
+      // Error case
+      if (error) {
+        setStatus('error');
+        setMessage(errorDescription || 'Lien de vérification invalide.');
+        return;
+      }
+
+      // Verify the code
+      if (code) {
+        try {
+          await supabase.auth.verifyOtp({
+            email: searchParams.get('email') || '',
+            token: code,
+            type: 'email',
+          });
+          setStatus('success');
+          setMessage('Compte vérifié avec succès ! Redirection...');
+          setTimeout(() => router.push('/login'), 2000);
+        } catch (err) {
+          setStatus('error');
+          setMessage('Lien expiré ou invalide. Veuillez vous reconnecter.');
+        }
+        return;
+      }
+
+      // No code params — just show info page
+      setStatus('success');
+      setMessage('Vérifiez votre email pour activer votre compte.');
+    };
+
+    verify();
+  }, [searchParams, router]);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="mb-8">
-          <Link
-            href="/login"
-            className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 transition-colors"
-          >
-            <ArrowLeft className="mr-1 h-4 w-4" />
-            Retour à la connexion
-          </Link>
-        </div>
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
-          <div className="text-center space-y-6">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-              <Mail className="h-8 w-8 text-blue-600" />
-            </div>
-
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Vérifiez votre email</h1>
-              <p className="text-sm text-gray-500 mt-2">
-                Nous vous avons envoyé un email de vérification. Veuillez cliquer sur le lien dans l&apos;email pour activer votre compte.
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/30 px-4">
+      <div className="w-full max-w-sm">
+        <div className="bg-card border border-border rounded-2xl shadow-xl p-6 space-y-4 text-center">
+          {status === 'loading' && (
+            <>
+              <Loader2 className="h-10 w-10 mx-auto animate-spin text-primary" />
+              <h1 className="text-xl font-semibold">Vérification...</h1>
+              <p className="text-sm text-muted-foreground">
+                Nous vérifions votre lien, veuillez patienter.
               </p>
-            </div>
+            </>
+          )}
 
-            <div className="bg-blue-50 border border-blue-200 text-blue-700 text-sm rounded-lg p-4">
-              <p className="font-medium">Vous ne recevez pas l&apos;email ?</p>
-              <p className="mt-1">Vérifiez votre dossier spam ou essayez de demander un nouvel email.</p>
-            </div>
+          {status === 'success' && (
+            <>
+              <div className="mx-auto w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
+              <h1 className="text-xl font-semibold text-foreground">
+                Email vérifié !
+              </h1>
+              <p className="text-sm text-muted-foreground">{message}</p>
+              <Link
+                href="/login"
+                className="inline-flex items-center text-sm font-medium text-primary hover:underline"
+              >
+                <ArrowLeft className="mr-1 h-3 w-3" />
+                Aller à la connexion
+              </Link>
+            </>
+          )}
 
-            <Link
-              href="/login"
-              className="inline-flex items-center text-blue-600 hover:text-blue-700 hover:underline font-medium"
-            >
-              Retour à la connexion
-            </Link>
-          </div>
+          {status === 'error' && (
+            <>
+              <div className="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              </div>
+              <h1 className="text-xl font-semibold text-foreground">
+                Erreur de vérification
+              </h1>
+              <p className="text-sm text-muted-foreground">{message}</p>
+              <div className="pt-2">
+                <Link
+                  href="/login"
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  Retour à la connexion
+                </Link>
+              </div>
+            </>
+          )}
         </div>
-        <p className="text-center text-xs text-gray-400 mt-6">
+
+        <p className="text-center text-xs text-muted-foreground mt-4">
           © 2026 Stocky. Tous droits réservés.
         </p>
       </div>
     </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <VerifyContent />
+    </Suspense>
   );
 }
