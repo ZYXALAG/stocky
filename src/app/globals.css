@@ -58,6 +58,28 @@
   }
 }
 
+/* ─── Dark mode: overrides for hardcoded utilities ───
+   Les composants utilisent encore des classes gris/blanc hardcodées.
+   Cette couche force leurs équivalents sombres quand .dark est actif
+   (next-themes attribute="class"). Spécificité (0,2,0) > utilitaire (0,1,0). */
+.dark .bg-white { background-color: hsl(222.2 84% 8.2%); }
+.dark .bg-gray-50 { background-color: hsl(217.2 32.6% 12%); }
+.dark .bg-gray-100 { background-color: hsl(217.2 32.6% 15%); }
+.dark .bg-gray-800 { background-color: hsl(217.2 32.6% 15%); }
+.dark .bg-gray-900 { background-color: hsl(222.2 84% 6%); }
+.dark .bg-blue-50 { background-color: hsl(217.2 32.6% 10%); }
+.dark .text-gray-200 { color: hsl(210 40% 90%); }
+.dark .text-gray-300 { color: hsl(210 40% 85%); }
+.dark .text-gray-400 { color: hsl(215 20.2% 65%); }
+.dark .text-gray-500 { color: hsl(215 20.2% 60%); }
+.dark .text-gray-600 { color: hsl(215 20.2% 78%); }
+.dark .text-gray-700 { color: hsl(210 40% 92%); }
+.dark .text-gray-900 { color: hsl(210 40% 98%); }
+.dark .border-gray-100 { border-color: hsl(217.2 32.6% 18%); }
+.dark .border-gray-300 { border-color: hsl(217.2 32.6% 25%); }
+.dark .border-gray-600 { border-color: hsl(217.2 32.6% 30%); }
+.dark .border-gray-800 { border-color: hsl(217.2 32.6% 20%); }
+
 /* ─── Print styles ─── */
 @media print {
   @page {

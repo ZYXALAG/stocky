@@ -1,0 +1,2 @@
+-- SQL via PostgREST RPC
+-- This file will be used with the postgres extension
